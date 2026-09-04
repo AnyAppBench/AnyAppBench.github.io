@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AnyAppBench — Same Tasks, Different Apps</title>
+  <meta name="description" content="AnyAppBench: a category-controlled live Android benchmark that measures whether mobile GUI agents can complete the same task across different apps, and diagnoses why they fail.">
+  <meta name="keywords" content="AnyAppBench, mobile GUI agents, Android benchmark, cross-application generalization, GUI agent evaluation, LLM-as-judge">
+  <!-- Social cards -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AnyAppBench — Same Tasks, Different Apps">
+  <meta property="og:description" content="Can a mobile GUI agent that succeeds in one app do the same task in another app with the same function? A live Android benchmark with 10 categories, 100 templates, 52 apps and 520 task–app combinations.">
+  <meta property="og:image" content="static/images/og_card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="static/images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+<!-- ============================== NAV ============================== -->
+<nav class="topnav" id="topnav">
+  <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>AnyAppBench</a>
+  <div class="navlinks">
+    <a href="#problem">Problem</a>
+    <a href="#benchmark">Benchmark</a>
+    <a href="#diagnosis">Diagnosis</a>
+    <a href="#findings">Findings</a>
+    <a href="#leaderboard">Leaderboard</a>
+    <a href="#quickstart">Quickstart</a>
+    <a href="#bibtex">BibTeX</a>
+  </div>
+</nav>
+
+<!-- ============================== HERO ============================== -->
+<header class="hero" id="top">
+  <div class="container">
+    <div class="hero-badge">Live Android benchmark · Mobile GUI agents</div>
+    <div class="hero-name">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="4"  y="4"  width="26" height="26" rx="7" fill="#c7d2fe"/>
+        <rect x="34" y="4"  width="26" height="26" rx="7" fill="#a5b4fc"/>
+        <rect x="4"  y="34" width="26" height="26" rx="7" fill="#818cf8"/>
+        <rect x="34" y="34" width="26" height="26" rx="7" fill="#4f46e5"/>
+        <path d="M40 47 l5 5 l10 -11" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1>AnyAppBench</h1>
+    </div>
+    <p class="hero-title">Same Tasks, Different Apps:<br>Why Mobile GUI Agents Fail to Generalize?</p>
+
+    <!-- TODO: replace placeholder authors / affiliations -->
+    <p class="authors">
+      <a href="#">Author One</a><sup>1</sup>,
+      <a href="#">Author Two</a><sup>1</sup>,
+      <a href="#">Author Three</a><sup>2</sup>,
+      <a href="#">Author Four</a><sup>1</sup>
+    </p>
+    <p class="affils"><sup>1</sup>KAIST &nbsp;·&nbsp; <sup>2</sup>Affiliation Two</p>
+    <p class="venue">Findings of the Association for Computational Linguistics: EMNLP 2026</p>
+
+    <div class="btn-row">
+      <a class="btn" href="static/paper/anyappbench.pdf"><span class="ico">📄</span>Paper</a>
+      <a class="btn" href="https://arxiv.org/abs/2609.00000"><span class="ico">📚</span>arXiv</a>
+      <a class="btn" href="https://github.com/AnyAppBench/benchmark"><span class="ico">💻</span>Code</a>
+      <a class="btn" href="#"><span class="ico">🗂️</span>Data</a>
+      <a class="btn" href="#leaderboard"><span class="ico">🏆</span>Leaderboard</a>
+      <a class="btn" href="#"><span class="ico">🎬</span>Video</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============================== TEASER ============================== -->
+<section class="section teaser">
+  <div class="container">
+    <!-- TODO: replace with <video autoplay muted loop playsinline src="static/videos/teaser.mp4"> -->
+    <div class="ph ph-video" data-asset="static/videos/teaser.mp4">
+      <div class="ph-label">Teaser video<br><code>static/videos/teaser.mp4</code></div>
+    </div>
+    <p class="caption">
+      One user goal, one agent, several apps that all support that goal. <b>AnyAppBench</b> holds the task fixed and changes only the app —
+      so a drop in success can only come from the interface, not from the task.
+    </p>
+
+    <div class="stats">
+      <div class="stat"><div class="num">10</div><div class="lbl">functional categories</div></div>
+      <div class="stat"><div class="num">100</div><div class="lbl">task templates</div></div>
+      <div class="stat"><div class="num">52</div><div class="lbl">apps <span class="muted">(11 original AndroidWorld + 41 new)</span></div></div>
+      <div class="stat"><div class="num">520</div><div class="lbl">task–app combinations</div></div>
+      <div class="stat"><div class="num">4</div><div class="lbl">failure modes, human-validated judge</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PROBLEM ============================== -->
+<section class="section" id="problem">
+  <div class="container">
+    <h2>Does success in one app transfer to another app with the same function?</h2>
+    <p class="lead">
+      Recent agents exceed 90% success on live Android benchmarks — but every task there is bound to <em>one</em> app.
+      Deployment is different: a user says <em>"set an alarm for 7:30"</em> and expects it to work in <em>whatever</em> clock app is installed.
+      Below, the instruction stays identical; only the app changes.
+    </p>
+
+    <div class="tabs" id="cat-tabs" role="tablist"></div>
+
+    <div class="grid-demo">
+      <div class="instruction">
+        <span class="chip">Instruction</span>
+        <span id="demo-instruction">Set an alarm for 7:30 AM on weekdays labelled “Gym”.</span>
+      </div>
+      <div class="phones" id="demo-phones"></div>
+      <p class="caption small">
+        Placeholders — drop screenshots into <code>static/images/grid/&lt;category&gt;/&lt;app&gt;.png</code> and edit
+        <code>static/js/main.js</code> (<code>DEMO</code> table). ✓ / ✗ badges are illustrative.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== BENCHMARK ============================== -->
+<section class="section alt" id="benchmark">
+  <div class="container">
+    <h2>What is AnyAppBench?</h2>
+    <p class="lead">
+      A <b>category-controlled</b>, live Android benchmark. We define 10 functional categories corresponding to common mobile goals,
+      write 10 reusable task templates per category with deterministic verifiers, and instantiate every template across
+      structurally diverse apps that support the same user-facing goal — 11 original AndroidWorld apps and 41 new apps chosen for interface diversity.
+    </p>
+
+    <div class="two-col">
+      <div class="ph ph-fig" data-asset="static/images/benchmark_overview.png">
+        <div class="ph-label">Figure: benchmark construction pipeline<br><code>static/images/benchmark_overview.png</code></div>
+      </div>
+      <div>
+        <h3>10 categories · 52 apps</h3>
+        <ul class="cats">
+          <li><span class="emoji">✅</span> Tasks</li>
+          <li><span class="emoji">📝</span> Notes</li>
+          <li><span class="emoji">💰</span> Finance</li>
+          <li><span class="emoji">🎵</span> Music</li>
+          <li><span class="emoji">📅</span> Calendar</li>
+          <li><span class="emoji">💬</span> SMS</li>
+          <li><span class="emoji">📁</span> File Manager</li>
+          <li><span class="emoji">🗺️</span> Maps</li>
+          <li><span class="emoji">👤</span> Contacts</li>
+          <li><span class="emoji">⏰</span> Clock</li>
+        </ul>
+        <p class="small muted">Each category: 1 original AndroidWorld app + several new apps · 10 templates · fixed parameters, initialization logic and state-based verifiers.</p>
+      </div>
+    </div>
+
+    <h3>How is it different from existing benchmarks?</h3>
+    <!-- TODO: verify every cell against the paper's related-work table before release -->
+    <div class="table-wrap">
+      <table class="cmp">
+        <thead>
+          <tr><th>Benchmark</th><th>Live environment</th><th>Same goal, different apps</th><th>Category-controlled</th><th>Failure attribution</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>AndroidWorld</td><td class="yes">✓</td><td class="no">✗ (one app per task)</td><td class="no">✗</td><td class="no">✗</td></tr>
+          <tr><td>AndroidLab</td><td class="yes">✓</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td></tr>
+          <tr><td>SPA-Bench</td><td class="yes">✓</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td></tr>
+          <tr><td>GUI-Odyssey</td><td class="no">✗ (offline)</td><td class="no">✗ (multi-app workflows)</td><td class="no">✗</td><td class="no">✗</td></tr>
+          <tr><td>TransBench</td><td class="no">✗</td><td class="part">partial</td><td class="no">✗</td><td class="no">✗</td></tr>
+          <tr class="ours"><td>AnyAppBench</td><td class="yes">✓</td><td class="yes">✓ (520 task–app pairs)</td><td class="yes">✓</td><td class="yes">✓ human-validated judge</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== DIAGNOSIS ============================== -->
+<section class="section" id="diagnosis">
+  <div class="container">
+    <h2>How do we diagnose <em>why</em> an agent fails to generalize?</h2>
+    <p class="lead">
+      Beyond success rate, every failed trajectory is attributed to a cause. We run agents twice — from the raw user instruction, and
+      with externally provided <b>app-agnostic sub-goals</b> — then a human-validated LLM-as-judge pipeline labels each failure.
+    </p>
+
+    <div class="flow">
+      <div class="node">Raw instruction<br><span class="muted small">or + app-agnostic sub-goals</span></div>
+      <div class="arrow">→</div>
+      <div class="node">Agent runs on<br>original / new app</div>
+      <div class="arrow">→</div>
+      <div class="node">Trajectory +<br>state-based verifier</div>
+      <div class="arrow">→</div>
+      <div class="node judge">LLM-as-judge<br><span class="muted small">human-validated</span></div>
+    </div>
+    <div class="modes">
+      <span class="modes-lbl">Each failed trajectory is attributed to</span>
+      <span class="mode plan">Planning</span>
+      <span class="mode ground">Grounding / Execution</span>
+      <span class="mode mixed">Mixed</span>
+      <span class="mode other">Other</span>
+    </div>
+
+    <div class="two-col">
+      <div class="ph ph-fig" data-asset="static/images/failure_attribution.png">
+        <div class="ph-label">Figure: failure attribution by app<br><code>static/images/failure_attribution.png</code></div>
+      </div>
+      <div class="ph ph-fig" data-asset="static/images/subgoal_ablation.png">
+        <div class="ph-label">Figure: raw instruction vs. sub-goal augmented<br><code>static/images/subgoal_ablation.png</code></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FINDINGS ============================== -->
+<section class="section alt" id="findings">
+  <div class="container">
+    <h2>What did we find?</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-num">01</div>
+        <h3>Transfer is weak</h3>
+        <p>Success on the original AndroidWorld app does not reliably transfer to new apps that support the same goal. Average drop: <span class="tbd">XX.X pts</span> across model families.</p>
+      </div>
+      <div class="card">
+        <div class="card-num">02</div>
+        <h3>The failure mode changes with the interface</h3>
+        <p>The same agent fails for different reasons in different apps — planning-dominated in one, grounding-dominated in another. Dominant mode flips in <span class="tbd">XX%</span> of categories.</p>
+      </div>
+      <div class="card">
+        <div class="card-num">03</div>
+        <h3>Sub-goals help, but don't close the gap</h3>
+        <p>App-agnostic sub-goals recover <span class="tbd">XX pts</span> on average, yet a substantial cross-app gap remains — the bottleneck is not only planning.</p>
+      </div>
+    </div>
+    <div class="ph ph-wide" data-asset="static/images/main_results.png">
+      <div class="ph-label">Figure: per-category success on original vs. new apps<br><code>static/images/main_results.png</code></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== LEADERBOARD ============================== -->
+<section class="section" id="leaderboard">
+  <div class="container">
+    <h2>Leaderboard</h2>
+    <p class="lead">Success rate on the original AndroidWorld app, on the new apps, and the signed transfer gap Δ. Numbers are placeholders until release.</p>
+    <div class="table-wrap">
+      <table class="lb">
+        <thead>
+          <tr><th>#</th><th>Agent</th><th>Backbone</th><th>Canonical SR</th><th>Alternative SR</th><th>Δ transfer</th><th>Planning fail</th><th>Grounding fail</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Agent A</td><td>Model A</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td>2026-XX</td></tr>
+          <tr><td>2</td><td>Agent B</td><td>Model B</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td>2026-XX</td></tr>
+          <tr><td>3</td><td>Agent C</td><td>Model C</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td>2026-XX</td></tr>
+          <tr><td>4</td><td>Agent D</td><td>Model D</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td>2026-XX</td></tr>
+          <tr><td>5</td><td>Agent E</td><td>Model E</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td class="tbd">—</td><td>2026-XX</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small">Want your agent listed? Run the full 520-pair suite and open an issue with the result JSON — see <a href="#quickstart">Quickstart</a>.</p>
+  </div>
+</section>
+
+<!-- ============================== QUICKSTART ============================== -->
+<section class="section alt" id="quickstart">
+  <div class="container">
+    <h2>How do I evaluate my agent?</h2>
+    <div class="steps">
+      <div class="step"><div class="step-n">1</div><div><b>Set up the environment</b><p>A headless emulator image plus scripts that install all 52 pinned APKs and pre-grant their runtime permissions.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div><b>Implement one interface</b><p>Your agent receives a screenshot and an accessibility tree, and returns a JSON action. Wrappers for common agents are included.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div><b>Run &amp; diagnose</b><p>Get success per task–app pair, the transfer gap per category, and judge-attributed failure modes.</p></div></div>
+    </div>
+<pre><code class="lang-bash">git clone https://github.com/AnyAppBench/benchmark.git
+cd benchmark/benchmark
+pip install -r requirements.txt
+
+# Check the suite resolves: 52 runnable apps, 520 task-app pairs.
+python scripts/verify_catbench_task_support.py
+
+# C1, direct execution.
+CATBENCH_CONDITION=c1 python scripts/run_catbench_5cat_matrix.py \
+    --models MY-AGENT --n_task_combinations 3 --task_random_seed 30 --run_id c1
+
+# Attribute the verifier-failed rollouts to a failure mode.
+python scripts/classify_catbench_failures.py --manifest runs/c1/manifest.json
+
+# Per-model and per-app tables.
+python scripts/report_catbench_5cat_results.py
+</code></pre>
+  </div>
+</section>
+
+<!-- ============================== BIBTEX ============================== -->
+<section class="section" id="bibtex">
+  <div class="container">
+    <div class="bib-head"><h2>BibTeX</h2><button class="copy" id="copy-bib">Copy</button></div>
+<pre id="bib"><code>@inproceedings{anyappbench2026,
+  title     = {Same Tasks, Different Apps: Why Mobile GUI Agents Fail to Generalize?},
+  author    = {Author One and Author Two and Author Three and Author Four},
+  booktitle = {Findings of the Association for Computational Linguistics: EMNLP 2026},
+  year      = {2026}
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p>AnyAppBench builds on <a href="https://github.com/google-research/android_world">AndroidWorld</a>. Page layout inspired by the <a href="https://nerfies.github.io/">Nerfies</a> project page. Content licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
+  </div>
+</footer>
+
+<script src="static/js/main.js"></script>
+</body>
+</html>
